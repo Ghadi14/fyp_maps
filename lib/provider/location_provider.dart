@@ -1,9 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 class LocationProvider with ChangeNotifier {
+  List<LatLng> _polylineCoordinates = [];
+  List<LatLng> get polylineCoordinates => _polylineCoordinates;
+
   BitmapDescriptor _pinlocationIcon;
   BitmapDescriptor get pinLocationIcon => _pinlocationIcon;
   Map<MarkerId, Marker> _markers;
@@ -28,6 +32,7 @@ class LocationProvider with ChangeNotifier {
   initalization() async {
     await getUserLocation();
     await setCustomMapPin();
+    getPolyPoints();
   }
 
   getUserLocation() async {
@@ -75,6 +80,7 @@ class LocationProvider with ChangeNotifier {
           onDragEnd: ((newPosition) {
             _locationPositionMarker = LatLng(_locationPositionMarker.latitude,
                 _locationPositionMarker.longitude);
+            getPolyPoints();
             notifyListeners();
           }));
 
@@ -86,5 +92,25 @@ class LocationProvider with ChangeNotifier {
   setCustomMapPin() async {
     _pinlocationIcon = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: 1), 'assets/marker.png');
+  }
+
+  // List<LatLng> polylineCoordinates = [];
+
+  void getPolyPoints() async {
+    PolylinePoints polylinePoints = PolylinePoints();
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      'AIzaSyDbAwcrqbVYV3NvUsLtzP2CCkWVzfa1W_w', // Your Google Map Key
+      PointLatLng(_locationPosition.latitude, _locationPosition.longitude),
+      PointLatLng(
+          _locationPositionMarker.latitude, _locationPositionMarker.longitude),
+    );
+    if (result.points.isNotEmpty) {
+      print('result.points.isNotEmpty');
+      result.points.forEach((PointLatLng point) => _polylineCoordinates.add(
+            LatLng(point.latitude, point.longitude),
+          ));
+
+      notifyListeners();
+    }
   }
 }

@@ -34,12 +34,20 @@ class _GoogleMapPagetState extends State<GoogleMapPage> {
           return Column(children: [
             Expanded(
                 child: GoogleMap(
-              mapType: MapType.normal,
+              mapType: MapType.hybrid,
               initialCameraPosition:
                   CameraPosition(target: model.locationPosition, zoom: 18),
               myLocationButtonEnabled: true,
               myLocationEnabled: true,
               markers: Set<Marker>.of(model.markers.values),
+              polylines: {
+                Polyline(
+                  polylineId: PolylineId('route'),
+                  points: model.polylineCoordinates,
+                  color: Colors.blue, // Set your desired color
+                  width: 5, // Set your desired width
+                ),
+              },
               onMapCreated: (GoogleMapController controller) {},
             ))
           ]);
