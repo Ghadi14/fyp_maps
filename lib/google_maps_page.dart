@@ -39,6 +39,7 @@ class _GoogleMapPagetState extends State<GoogleMapPage> {
                   CameraPosition(target: model.locationPosition, zoom: 18),
               myLocationButtonEnabled: true,
               myLocationEnabled: true,
+              markers: Set<Marker>.of(model.markers.values),
               onMapCreated: (GoogleMapController controller) {},
             ))
           ]);
